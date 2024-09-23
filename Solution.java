@@ -1,3 +1,4 @@
+import java.util.Arrays;
 import java.util.PriorityQueue;
 import java.util.Scanner;
 
@@ -11,6 +12,10 @@ public class Solution {
 
     static int id = 0;  // Iterator id pelanggan
 
+    static int[] P;  // Harga ikan
+    static int[] H;  // Harga suvenir
+    static int[] V;  // Nilai kebahagiaan suvenir
+
     public static void main(String[] args) {
 
         Scanner in = new Scanner(System.in);
@@ -19,9 +24,11 @@ public class Solution {
         int M = in.nextInt();  // Banyaknya suvenir
         int Q = in.nextInt();  // Banyaknya aktivitas
 
-        int[] P = new int[N];  // Harga ikan
-        int[] H = new int[M];  // Harga suvenir
-        int[] V = new int[M];  // Nilai kebahagiaan suvenir 
+        P = new int[N];
+        H = new int[M];
+        V = new int[M];
+
+        Arrays.sort(P);
 
         for (int i=0; i<N; i++) {
             P[i] = in.nextInt();
@@ -92,12 +99,12 @@ public class Solution {
     }
 
     static int S(int hargaDicari) {
-        return 0;
+        return binarySearchMinDiff(hargaDicari, P)[1];
     }
 
     static int L(int idPelanggan) {
         return 0;
-    }
+    } 
 
     static int D(int diskon) {
         return 0;
@@ -138,6 +145,28 @@ public class Solution {
             }
             System.out.println();
         }
+    }
+
+    static int[] binarySearchMinDiff(int budget, int[] harga) {  
+        // Menggunakan binary search untuk mencari harga paling mahal yang bisa dibeli dari budget yang dimiliki pelanggan
+        // Return array {index harga paling mahal, selisih}
+        int l = 0;
+        int r = harga.length - 1;
+
+        if (budget < harga[l]) return new int[]{l, -1};
+        if (budget > harga[r]) return new int[]{r, budget - harga[r]};
+
+        while (l < r-1) {
+
+            int mid = (l + r) / 2;
+
+            if (budget == harga[mid]) return new int[]{mid, 0};
+            else if (budget > harga[mid]) l = mid;
+            else r = mid;
+
+        }
+
+        return new int[]{l, budget - harga[l]};
     }
 
 }

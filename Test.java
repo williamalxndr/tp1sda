@@ -1,26 +1,26 @@
-import java.util.PriorityQueue;
-
 public class Test {
     public static void main(String[] args) {
-        PriorityQueue<int[]> queue = new PriorityQueue<>((a,b) -> {
-            if (a[1]!=b[1]) return Integer.compare(b[1], a[1]);
-            else if (a[2]!= b[2]) return Integer.compare(a[2], b[2]);
-            else return Integer.compare(a[0], b[0]);
-        });
+        int[] harga = new int[] {1,3,4,7,10,15,31};
+        System.out.println(binarySearch(2, harga));
+    }
 
-        queue.offer(new int[]{0,20,4});
-        queue.offer(new int[]{1,10,20});
-        queue.offer(new int[]{2,25,10});
-        queue.offer(new int[]{3,10,4});
+    static int binarySearch(int budget, int[] harga) {
+        int l = 0;
+        int r = harga.length - 1;
 
-        while (!queue.isEmpty()) {
-            int[] arr = queue.poll();
-            for (int i=0; i<arr.length; i++) {
-                System.out.print(arr[i]);
-                System.out.print(" ");
-            }
-            System.out.println();
+        if (budget < harga[l]) return -1;
+        if (budget > harga[r]) return budget - harga[r];
+
+        while (l < r-1) {
+
+            int mid = (l + r) / 2;
+
+            if (budget == harga[mid]) return 0;
+            else if (budget > harga[mid]) l = mid;
+            else r = mid;
+
         }
 
+        return budget - harga[l];
     }
 }
