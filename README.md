@@ -8,3 +8,6 @@ Commit 3:
     - S(): return selisih minimum antara hargaDicari dengan semua harga ikan yang ada
     - binarySearchMinDiff(): return {index, selisihMinimum} untuk implementasi method S() dan B()
     Note: keterangan di soal menyatakan bahwa method S() akan mereturn selisih minimum meskipun harga ikan > hargaDicari. (butuh revisi)
+
+TO DO:
+- Resolve method serve() masih salah return saat ada kupon diskon

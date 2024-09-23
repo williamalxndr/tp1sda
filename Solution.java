@@ -2,6 +2,7 @@ import java.util.Arrays;
 import java.util.PriorityQueue;
 import java.util.Scanner;
 import java.util.Stack;
+import java.lang.Math;
 
 public class Solution {
 
@@ -19,6 +20,8 @@ public class Solution {
 
     static Stack<Integer> kupon = new Stack<>();  // Kupon diskon 
 
+    static int[] initKesabaran;  // Nilai kesabaran awal setiap pelanggan (untuk mereset tingkat kesabaran setiap kali pelanggan dilayani)
+
     public static void main(String[] args) {
 
         Scanner in = new Scanner(System.in);
@@ -31,7 +34,9 @@ public class Solution {
         H = new int[M];
         V = new int[M];
 
-        Arrays.sort(P);  // Sort array agar bisa dilakukan binary search utk method2 yang akan dipakai
+        Arrays.sort(P);  // Sort harga ikan agar bisa dilakukan binary search utk method2 yang akan dipakai
+        
+        initKesabaran = new int[Q];
 
         for (int i=0; i<N; i++) {
             P[i] = in.nextInt();
@@ -97,6 +102,7 @@ public class Solution {
     static int A(int budget, int kesabaran) {
         int[] newPelanggan = new int[]{id, budget, kesabaran};
         queue.offer(newPelanggan);
+        initKesabaran[id] = kesabaran;
         id++;
         return id-1;
     }
@@ -107,8 +113,8 @@ public class Solution {
 
     static int L(int idPelanggan) {
         for (int[] pelanggan : queue) {
-            id = pelanggan[0];
-            if (id == idPelanggan) {
+            int thisId = pelanggan[0];
+            if (thisId == idPelanggan) {
                 int uang = pelanggan[1];
                 queue.remove(pelanggan);
                 return uang;
@@ -123,7 +129,9 @@ public class Solution {
     }
 
     static int B() {
-        return 0;
+        int kembalian = serve();
+        if (kembalian != 0) kupon.push(kembalian);
+        return kembalian;
     }
 
     static int O(int tipeQuery, int x) {
@@ -144,37 +152,40 @@ public class Solution {
         queue = newQueue;
     }
 
-    static void printQueue() {  // Debug
+    static void printQueue() {  // Untuk debug
+        PriorityQueue<int[]> newQueue = new PriorityQueue<>(queue.comparator());
         while (!queue.isEmpty()) {
             int[] pelanggan = queue.poll();
+            newQueue.offer(pelanggan);
             for (int i=0; i<3; i++) {
                 System.out.print(pelanggan[i]);
                 System.out.print(" ");
             }
             System.out.println();
         }
+        queue = newQueue;
     }
 
-    static int[] hargaMax(int budget, int[] harga) {  
+    static int hargaMax(int budget, int[] harga) {  
         // Menggunakan binary search untuk mencari harga paling mahal yang bisa dibeli dari budget yang dimiliki pelanggan (untuk method B).
-        // Return array {index harga paling mahal, selisih}
+        // Return harga ikan paling mahal yang bisa dibeli
         int l = 0;
         int r = harga.length - 1;
 
-        if (budget < harga[l]) return new int[]{l, -1};
-        if (budget > harga[r]) return new int[]{r, budget - harga[r]};
+        if (budget < harga[l]) return -1;
+        if (budget > harga[r]) return harga[r];
 
         while (l < r-1) {
 
             int mid = (l + r) / 2;
 
-            if (budget == harga[mid]) return new int[]{mid, 0};
+            if (budget == harga[mid]) return harga[mid];
             else if (budget > harga[mid]) l = mid;
             else r = mid;
 
         }
 
-        return new int[]{l, budget - harga[l]};
+        return harga[l];
     }
 
     static int minDiff(int hargaDicari, int[] harga) {
@@ -199,6 +210,33 @@ public class Solution {
         }
 
         return Math.min(Math.abs(hargaDicari - harga[l]), Math.abs(hargaDicari - harga[r]));
+    }
+
+    static int serve() {
+        if (queue.isEmpty()) return -1;
+
+        int[] pelanggan = queue.poll();
+        int budget = pelanggan[1];
+
+        int hargaIkan = hargaMax(budget, P);
+
+        if (hargaIkan == -1) return -1;
+
+        int diskon = 0;
+        if (budget == hargaIkan) {
+            diskon += kupon.isEmpty() ? 0 : kupon.pop();
+        }
+
+        int pay = Math.max(1, hargaIkan-diskon);
+
+        int kembalian = budget - pay;
+
+        pelanggan[1] = kembalian;
+        pelanggan[2] = initKesabaran[pelanggan[0]];
+
+        queue.offer(pelanggan);
+
+        return kembalian;
     }
 
 }
