@@ -1,6 +1,7 @@
 import java.util.Arrays;
 import java.util.PriorityQueue;
 import java.util.Scanner;
+import java.util.Stack;
 
 public class Solution {
 
@@ -15,6 +16,8 @@ public class Solution {
     static int[] P;  // Harga ikan
     static int[] H;  // Harga suvenir
     static int[] V;  // Nilai kebahagiaan suvenir
+
+    static Stack<Integer> kupon = new Stack<>();  // Kupon diskon 
 
     public static void main(String[] args) {
 
@@ -103,11 +106,20 @@ public class Solution {
     }
 
     static int L(int idPelanggan) {
-        return 0;
+        for (int[] pelanggan : queue) {
+            id = pelanggan[0];
+            if (id == idPelanggan) {
+                int uang = pelanggan[1];
+                queue.remove(pelanggan);
+                return uang;
+            }
+        }
+        return -1;
     } 
 
     static int D(int diskon) {
-        return 0;
+        kupon.push(diskon);
+        return kupon.size();
     }
 
     static int B() {
@@ -120,10 +132,6 @@ public class Solution {
 
 
     // Method2 pembantu
-    static int[] sortedArr(int[] unsortedArr) {
-        return new int[0];
-    }
-
     static void decrementKesabaran() {
         PriorityQueue<int[]> newQueue = new PriorityQueue<>(queue.comparator());
         while (!queue.isEmpty()) {
@@ -148,7 +156,7 @@ public class Solution {
     }
 
     static int[] binarySearchMinDiff(int budget, int[] harga) {  
-        // Menggunakan binary search untuk mencari harga paling mahal yang bisa dibeli dari budget yang dimiliki pelanggan
+        // Menggunakan binary search untuk mencari harga paling mahal yang bisa dibeli dari budget yang dimiliki pelanggan (untuk method B).
         // Return array {index harga paling mahal, selisih}
         int l = 0;
         int r = harga.length - 1;
