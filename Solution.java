@@ -31,7 +31,7 @@ public class Solution {
         H = new int[M];
         V = new int[M];
 
-        Arrays.sort(P);
+        Arrays.sort(P);  // Sort array agar bisa dilakukan binary search utk method2 yang akan dipakai
 
         for (int i=0; i<N; i++) {
             P[i] = in.nextInt();
@@ -102,7 +102,7 @@ public class Solution {
     }
 
     static int S(int hargaDicari) {
-        return binarySearchMinDiff(hargaDicari, P)[1];
+        return minDiff(hargaDicari, P);
     }
 
     static int L(int idPelanggan) {
@@ -155,7 +155,7 @@ public class Solution {
         }
     }
 
-    static int[] binarySearchMinDiff(int budget, int[] harga) {  
+    static int[] hargaMax(int budget, int[] harga) {  
         // Menggunakan binary search untuk mencari harga paling mahal yang bisa dibeli dari budget yang dimiliki pelanggan (untuk method B).
         // Return array {index harga paling mahal, selisih}
         int l = 0;
@@ -175,6 +175,30 @@ public class Solution {
         }
 
         return new int[]{l, budget - harga[l]};
+    }
+
+    static int minDiff(int hargaDicari, int[] harga) {
+        // Mencari selisih minimum menggunakan binary search (berbeda dengan method hargaMax(), method ini bisa mencari selisih meskipun harga ikan > hargaDicari)
+        // Untuk method S
+        int l = 0;
+        int r = harga.length - 1;
+
+        if (harga[l] > hargaDicari) return harga[l] - hargaDicari;
+        if (harga[r] < hargaDicari) return hargaDicari - harga[r];
+
+        while (l < r-1) {
+            int mid = (l + r) / 2;
+
+            int diffLeft = hargaDicari - harga[l];
+            int diffMid = hargaDicari - harga[mid];
+            int diffRight = hargaDicari - harga[r];
+
+            if ((diffLeft * diffMid) < 0) r = mid;
+            else if ((diffRight * diffMid) < 0) l = mid;
+            else if (diffLeft == 0 || diffMid == 0 || diffRight == 0) return 0;
+        }
+
+        return Math.min(Math.abs(hargaDicari - harga[l]), Math.abs(hargaDicari - harga[r]));
     }
 
 }
