@@ -4,9 +4,9 @@ import java.util.Scanner;
 public class Solution {
 
     static PriorityQueue<int[]> queue = new PriorityQueue<>((a,b) -> {  // Queue pelanggan {id, budget, kesabaran}
-        if (a[1]!=b[1]) return Integer.compare(b[1], a[1]);  // Compare budget
-        else if (a[2]!= b[2]) return Integer.compare(a[2], b[2]);  // Compare kesabaran
-        else return Integer.compare(a[0], b[0]);  // Compare id
+        if (a[1]!=b[1]) return Integer.compare(b[1], a[1]);  // Compare budget (descending)
+        else if (a[2]!= b[2]) return Integer.compare(a[2], b[2]);  // Compare kesabaran (ascending)
+        else return Integer.compare(a[0], b[0]);  // Compare id (ascending)
     });
 
     static int id = 0;  // Iterator id pelanggan
@@ -37,7 +37,7 @@ public class Solution {
 
         for (int i=0; i<Q; i++) {
 
-            // decrementKesabaran();  // Kurangi satu poin kesabaran untuk semua pelanggan yang ada di queue 
+            decrementKesabaran();  // Kurangi satu poin kesabaran untuk semua pelanggan yang ada di queue 
 
             String query = in.next();
 
@@ -46,7 +46,6 @@ public class Solution {
                     int budget = in.nextInt();
                     int kesabaran = in.nextInt();
                     System.out.println(A(budget, kesabaran));
-                    printQueue();
                     break;
 
                 case "S":  // Query S = selisih minimum antara <hargaDicari> dengan semua harga ikan di toko
@@ -72,6 +71,10 @@ public class Solution {
                     int tipeQuery = in.nextInt();
                     int x = in.nextInt();
                     System.out.println(O(tipeQuery, x));
+                    break;
+                
+                case "DEBUG":
+                    printQueue();
                     break;
             }
         }
@@ -126,10 +129,11 @@ public class Solution {
         queue = newQueue;
     }
 
-    static void printQueue() {
-        for (int[] arr : queue) {
+    static void printQueue() {  // Debug
+        while (!queue.isEmpty()) {
+            int[] pelanggan = queue.poll();
             for (int i=0; i<3; i++) {
-                System.out.print(arr[i]);
+                System.out.print(pelanggan[i]);
                 System.out.print(" ");
             }
             System.out.println();
