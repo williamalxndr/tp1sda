@@ -14,13 +14,15 @@ public class Solution {
 
     static int id = 0;  // Iterator id pelanggan
 
+    static int t;
+
     static int[] P;  // Harga ikan
     static int[] H;  // Harga suvenir
     static int[] V;  // Nilai kebahagiaan suvenir
 
     static Stack<Integer> kupon = new Stack<>();  // Kupon diskon 
 
-    static int[] initKesabaran;  // Nilai kesabaran awal setiap pelanggan (untuk mereset tingkat kesabaran setiap kali pelanggan dilayani)
+    static int[][] dataPelanggan;  // Untuk menyimpan data pelanggan awal, index i = pelanggan id i
 
     public static void main(String[] args) {
 
@@ -36,7 +38,7 @@ public class Solution {
 
         Arrays.sort(P);  // Sort harga ikan agar bisa dilakukan binary search utk method2 yang akan dipakai
         
-        initKesabaran = new int[Q];
+        dataPelanggan = new int[Q][3];
 
         for (int i=0; i<N; i++) {
             P[i] = in.nextInt();
@@ -51,8 +53,8 @@ public class Solution {
         }
 
         for (int i=0; i<Q; i++) {
-
-            decrementKesabaran();  // Kurangi satu poin kesabaran untuk semua pelanggan yang ada di queue 
+            t = i;
+            checkDepan();  // Cek kesabaran orang paling depan, jika sudah marah pop sampai ketemu yang masih sabar
 
             String query = in.next();
 
@@ -90,6 +92,7 @@ public class Solution {
                 
                 case "DEBUG":
                     printQueue();
+                    printKupon();
                     break;
             }
         }
@@ -100,9 +103,9 @@ public class Solution {
 
     // Method2 query
     static int A(int budget, int kesabaran) {
-        int[] newPelanggan = new int[]{id, budget, kesabaran};
+        int[] newPelanggan = new int[]{id, budget, kesabaran + t};
         queue.offer(newPelanggan);
-        initKesabaran[id] = kesabaran;
+        dataPelanggan[id] = newPelanggan;
         id++;
         return id-1;
     }
@@ -112,15 +115,15 @@ public class Solution {
     }
 
     static int L(int idPelanggan) {
-        for (int[] pelanggan : queue) {
-            int thisId = pelanggan[0];
-            if (thisId == idPelanggan) {
-                int uang = pelanggan[1];
-                queue.remove(pelanggan);
-                return uang;
-            }
+        
+        int[] pelanggan = dataPelanggan[idPelanggan];
+        if (pelanggan[2] < (t+1) && queue.remove(pelanggan)) {
+            return -1;
         }
-        return -1;
+
+        if (queue.remove(pelanggan)) {return pelanggan[1];}
+        else return -1;
+
     } 
 
     static int D(int diskon) {
@@ -130,7 +133,6 @@ public class Solution {
 
     static int B() {
         int kembalian = serve();
-        printKupon();
         return kembalian;
     }
 
@@ -138,23 +140,22 @@ public class Solution {
         return 0;
     }
 
-
     // Method2 pembantu
-    static void decrementKesabaran() {
-        PriorityQueue<int[]> newQueue = new PriorityQueue<>(queue.comparator());
-        while (!queue.isEmpty()) {
-            int[] pelanggan = queue.poll();
-            pelanggan[2]--; 
-            if (pelanggan[2] > 0) {
-                newQueue.offer(pelanggan); 
-            }
+    static void checkDepan() {
+
+        if (queue.isEmpty()) return;
+
+        while (queue.peek() == null || queue.peek()[2] < (t+1)) {
+            queue.poll();
+            if (queue.isEmpty()) return;
         }
-        queue = newQueue;
+
     }
 
-    // debug 
-    static void printQueue() {  // Untuk debug
+    // Debug 
+    static void printQueue() {  // Debug queue
         PriorityQueue<int[]> newQueue = new PriorityQueue<>(queue.comparator());
+        System.out.println(queue.size());
         while (!queue.isEmpty()) {
             int[] pelanggan = queue.poll();
             newQueue.offer(pelanggan);
@@ -167,7 +168,7 @@ public class Solution {
         queue = newQueue;
     }
 
-    static void printKupon() {
+    static void printKupon() {  // Print tumpukan kupon
         System.out.print("Kupon diskon: ");
         System.out.println(Arrays.toString(kupon.toArray()));
     }
@@ -222,35 +223,32 @@ public class Solution {
         if (queue.isEmpty()) return -1;
 
         int[] pelanggan = queue.poll();
-        System.out.print("Pelanggan: ");
-        System.out.println(Arrays.toString(pelanggan));
+
+        int id = pelanggan[0];
         int budget = pelanggan[1];
+        int kesabaran = pelanggan[2];
 
         int hargaIkan = hargaMax(budget, P);
-        System.out.print("Harga ikan: ");
-        System.out.println(hargaIkan);
 
         if (hargaIkan == -1) return -1;
 
         int diskon = 0;
         if (budget == hargaIkan) {
             diskon += kupon.isEmpty() ? 0 : kupon.pop();
-            System.out.print("Diskon: ");
-            System.out.println(diskon);
+
         } else kupon.push(budget - hargaIkan);
 
         int pay = Math.max(1, hargaIkan-diskon);
-        System.out.print("Pay: ");
-        System.out.println(pay);
 
         int kembalian = budget - pay;
 
         pelanggan[1] = kembalian;
-        pelanggan[2] = initKesabaran[pelanggan[0]];
+        dataPelanggan[id][1] = kembalian;
+
+        pelanggan[2] = kesabaran + t;
+        dataPelanggan[id][2] = kesabaran + t;
 
         queue.offer(pelanggan);
-        System.out.println("Queue: ");
-        printQueue();
 
         return kembalian;
     }
