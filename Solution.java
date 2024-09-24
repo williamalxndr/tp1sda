@@ -130,7 +130,7 @@ public class Solution {
 
     static int B() {
         int kembalian = serve();
-        if (kembalian != 0) kupon.push(kembalian);
+        printKupon();
         return kembalian;
     }
 
@@ -152,6 +152,7 @@ public class Solution {
         queue = newQueue;
     }
 
+    // debug 
     static void printQueue() {  // Untuk debug
         PriorityQueue<int[]> newQueue = new PriorityQueue<>(queue.comparator());
         while (!queue.isEmpty()) {
@@ -164,6 +165,11 @@ public class Solution {
             System.out.println();
         }
         queue = newQueue;
+    }
+
+    static void printKupon() {
+        System.out.print("Kupon diskon: ");
+        System.out.println(Arrays.toString(kupon.toArray()));
     }
 
     static int hargaMax(int budget, int[] harga) {  
@@ -216,18 +222,26 @@ public class Solution {
         if (queue.isEmpty()) return -1;
 
         int[] pelanggan = queue.poll();
+        System.out.print("Pelanggan: ");
+        System.out.println(Arrays.toString(pelanggan));
         int budget = pelanggan[1];
 
         int hargaIkan = hargaMax(budget, P);
+        System.out.print("Harga ikan: ");
+        System.out.println(hargaIkan);
 
         if (hargaIkan == -1) return -1;
 
         int diskon = 0;
         if (budget == hargaIkan) {
             diskon += kupon.isEmpty() ? 0 : kupon.pop();
-        }
+            System.out.print("Diskon: ");
+            System.out.println(diskon);
+        } else kupon.push(budget - hargaIkan);
 
         int pay = Math.max(1, hargaIkan-diskon);
+        System.out.print("Pay: ");
+        System.out.println(pay);
 
         int kembalian = budget - pay;
 
@@ -235,6 +249,8 @@ public class Solution {
         pelanggan[2] = initKesabaran[pelanggan[0]];
 
         queue.offer(pelanggan);
+        System.out.println("Queue: ");
+        printQueue();
 
         return kembalian;
     }
