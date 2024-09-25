@@ -140,7 +140,6 @@ public class Solution {
         return 0;
     }
 
-    // Method2 pembantu
     static void checkDepan() {
 
         if (queue.isEmpty()) return;
@@ -152,7 +151,6 @@ public class Solution {
 
     }
 
-    // Debug 
     static void printQueue() {  // Debug queue
         PriorityQueue<int[]> newQueue = new PriorityQueue<>(queue.comparator());
         System.out.println(queue.size());
@@ -201,19 +199,17 @@ public class Solution {
         int l = 0;
         int r = harga.length - 1;
 
-        if (harga[l] > hargaDicari) return harga[l] - hargaDicari;
-        if (harga[r] < hargaDicari) return hargaDicari - harga[r];
+        if (harga[l] >= hargaDicari) return harga[l] - hargaDicari;
+        if (harga[r] <= hargaDicari) return hargaDicari - harga[r];
 
         while (l < r-1) {
             int mid = (l + r) / 2;
 
-            int diffLeft = hargaDicari - harga[l];
             int diffMid = hargaDicari - harga[mid];
-            int diffRight = hargaDicari - harga[r];
 
-            if ((diffLeft * diffMid) < 0) r = mid;
-            else if ((diffRight * diffMid) < 0) l = mid;
-            else if (diffLeft == 0 || diffMid == 0 || diffRight == 0) return 0;
+            if (diffMid > 0) l = mid;
+            else if (diffMid < 0) r = mid;
+            else return 0;
         }
 
         return Math.min(Math.abs(hargaDicari - harga[l]), Math.abs(hargaDicari - harga[r]));
@@ -230,13 +226,15 @@ public class Solution {
 
         int hargaIkan = hargaMax(budget, P);
 
-        if (hargaIkan == -1) return -1;
+        if (hargaIkan == -1) {
+            L(id);
+            return id;
+        }
 
         int diskon = 0;
         if (budget == hargaIkan) {
             diskon += kupon.isEmpty() ? 0 : kupon.pop();
-
-        } else kupon.push(budget - hargaIkan);
+        } else kupon.push(budget - hargaIkan);  
 
         int pay = Math.max(1, hargaIkan-diskon);
 
