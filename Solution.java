@@ -3,6 +3,7 @@ import java.util.PriorityQueue;
 import java.util.Scanner;
 import java.util.Stack;
 import java.lang.Math;
+import java.util.ArrayList;
 
 public class Solution {
 
@@ -23,6 +24,12 @@ public class Solution {
     static Stack<Integer> kupon = new Stack<>();  // Kupon diskon 
 
     static int[][] dataPelanggan;  // Untuk menyimpan data pelanggan awal, index i = pelanggan id i
+
+    static ArrayList<ArrayList<ArrayList<Integer>>> dp = new ArrayList<>(); 
+    // ArrayList of (ArrayList of (ArrayList (urutan indeks suvenir, kebahagiaan max))
+    // kebahagiaan max dimasukkan sebagai ArrayList dengan ukuran 1.
+
+    static int lastInserted = 0;
 
     public static void main(String[] args) {
 
@@ -137,6 +144,17 @@ public class Solution {
     }
 
     static int O(int tipeQuery, int x) {
+
+        if (x > lastInserted) {
+            insertDP(lastInserted, x, H, V);
+            lastInserted = x + 1;
+        }
+
+        ArrayList<ArrayList<Integer>> arrayJawaban = dp.get(x);
+
+        if (tipeQuery == 1) {
+            return arrayJawaban.get(arrayJawaban.size()-1).get(0);
+        } 
         return 0;
     }
 
@@ -250,6 +268,62 @@ public class Solution {
 
         return kembalian;
     }
+
+    static void insertDP(int lastInserted, int budget, int[] hargaSuvenir, int[]kebahagiaanSuvenir) {
+
+        for (int uang=lastInserted; uang<=budget; uang++) {
+
+            int maxKebahagiaan = 0;
+
+            ArrayList<ArrayList<Integer>> res = new ArrayList<>();
+
+            for (int j=0; j<hargaSuvenir.length; j++) {
+
+                int harga = hargaSuvenir[j];
+                int kebahagiaan = kebahagiaanSuvenir[j];
+
+                int sisa = uang - harga;
+                
+                if (sisa < 0) continue;
+
+                ArrayList<ArrayList<Integer>> rec = dp.get(sisa);
+
+                int lastKebahagiaan = rec.get(rec.size()-1).get(0);
+                if ((lastKebahagiaan + kebahagiaan) < maxKebahagiaan) continue;
+
+                for (int jj=0; jj<rec.size()-1; jj++) {
+                    ArrayList<Integer> lastArrayIndex = rec.get(jj);
+
+                    // Jika suvenir j sudah diambil
+                    if (lastArrayIndex.contains(j)) continue;
+
+                    // Jika ada 3 consecutive suvenir diambil berturut turut
+                    if (lastArrayIndex.contains(j+1) && lastArrayIndex.contains(j+2)) continue;  
+                    if (lastArrayIndex.contains(j-1) && lastArrayIndex.contains(j+1)) continue;
+                    if (lastArrayIndex.contains(j-2) && lastArrayIndex.contains(j-1)) continue;
+
+                    // Jika tidak berurutan
+                    if (lastArrayIndex.get(lastArrayIndex.size()-1) > j) continue;
+
+                    ArrayList<Integer> arrayIndex = new ArrayList<>(lastArrayIndex);
+                    arrayIndex.add(j);
+
+                    if ((lastKebahagiaan + kebahagiaan) > maxKebahagiaan) res.clear();
+                    res.add(arrayIndex);
+                }
+
+                maxKebahagiaan = lastKebahagiaan + kebahagiaan;
+            }
+
+            if (res.size() == 0) res.add(new ArrayList<>());
+
+            res.add(new ArrayList<>(Arrays.asList(maxKebahagiaan)));
+
+            dp.add(res);
+
+        }
+    }
+
 
 }
  
