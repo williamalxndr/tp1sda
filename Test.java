@@ -7,13 +7,13 @@ public class Test {
     public static void main(String[] args) {
         int[] hargaSuvenir = new int[] {100,5,5,6,7,8,9};
         int[] kebahagiaanSuvenir = new int[] {1000,20,20,90,90,90,21};
-        int budget = 1000;
+        int budget = 11;
 
         insertDP(0, budget, hargaSuvenir, kebahagiaanSuvenir);
 
         Scanner in = new Scanner(System.in);
 
-        System.out.println(dp);
+        System.out.println(dp.get(budget));
 
         in.close();
 

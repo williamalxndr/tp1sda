@@ -94,7 +94,8 @@ public class Solution {
                 case "O":  // 
                     int tipeQuery = in.nextInt();
                     int x = in.nextInt();
-                    System.out.println(O(tipeQuery, x));
+                    if (tipeQuery == 1) O1(x);
+                    else if (tipeQuery == 2) O2(x);
                     break;
                 
                 case "DEBUG":
@@ -143,21 +144,35 @@ public class Solution {
         return kembalian;
     }
 
-    static int O(int tipeQuery, int x) {
+    static void O1(int x) {
+        if (x >= lastInserted) {
+            insertDP(lastInserted, x, H, V);
+            lastInserted = x + 1;
+        }
+        int kebahagiaanMaksimum = dp.get(x).getLast().get(0);
+        System.out.println(kebahagiaanMaksimum);
+    }
 
-        if (x > lastInserted) {
+    static void O2(int x) {
+        if (x >= lastInserted) {
             insertDP(lastInserted, x, H, V);
             lastInserted = x + 1;
         }
 
-        ArrayList<ArrayList<Integer>> arrayJawaban = dp.get(x);
+        int kebahagiaanMaksimum = dp.get(x).getLast().get(0);
+        System.out.print(kebahagiaanMaksimum);
+        
+        ArrayList<Integer> indexMin = dp.get(x).getFirst();
+        for (int i=0; i<indexMin.size(); i++) {
+            System.out.print(" ");
+            System.out.print(indexMin.get(i) + 1);
+        }
+        System.out.println();
 
-        if (tipeQuery == 1) {
-            return arrayJawaban.get(arrayJawaban.size()-1).get(0);
-        } 
-        return 0;
     }
 
+
+    // Method pembantu
     static void checkDepan() {
 
         if (queue.isEmpty()) return;
@@ -286,44 +301,54 @@ public class Solution {
                 
                 if (sisa < 0) continue;
 
-                ArrayList<ArrayList<Integer>> rec = dp.get(sisa);
+                ArrayList<ArrayList<Integer>> rec = sisa != harga ? dp.get(sisa) : dp.get(sisa - 1); 
 
                 int lastKebahagiaan = rec.get(rec.size()-1).get(0);
                 if ((lastKebahagiaan + kebahagiaan) < maxKebahagiaan) continue;
 
                 for (int jj=0; jj<rec.size()-1; jj++) {
                     ArrayList<Integer> lastArrayIndex = rec.get(jj);
+                    ArrayList<Integer> arrayIndex = new ArrayList<>(lastArrayIndex);
 
                     // Jika suvenir j sudah diambil
-                    if (lastArrayIndex.contains(j)) continue;
+                    if (lastArrayIndex.contains(j) && lastKebahagiaan >= maxKebahagiaan) {
+                        if (lastKebahagiaan > maxKebahagiaan) {
+                            res.clear();
+                            maxKebahagiaan = lastKebahagiaan;
+                        }
+                        if (!res.contains(arrayIndex)) {
+                            res.add(arrayIndex);
+                        }
+                        continue;
+                    } 
 
                     // Jika ada 3 consecutive suvenir diambil berturut turut
                     if (lastArrayIndex.contains(j+1) && lastArrayIndex.contains(j+2)) continue;  
                     if (lastArrayIndex.contains(j-1) && lastArrayIndex.contains(j+1)) continue;
                     if (lastArrayIndex.contains(j-2) && lastArrayIndex.contains(j-1)) continue;
 
-                    // Jika tidak berurutan
-                    if (lastArrayIndex.get(lastArrayIndex.size()-1) > j) continue;
 
-                    ArrayList<Integer> arrayIndex = new ArrayList<>(lastArrayIndex);
-                    arrayIndex.add(j);
+                    if (lastArrayIndex.size() > 0 && lastArrayIndex.getFirst() > j) arrayIndex.addFirst(j);
+                    else if (lastArrayIndex.size() > 0 && lastArrayIndex.getLast() < j) arrayIndex.addLast(j);
+                    else if (lastArrayIndex.size() == 0) arrayIndex.add(j);
+                    else continue;
 
                     if ((lastKebahagiaan + kebahagiaan) > maxKebahagiaan) res.clear();
+
+                    if (res.contains(arrayIndex)) continue;
                     res.add(arrayIndex);
+
+                    maxKebahagiaan = lastKebahagiaan + kebahagiaan;
                 }
-
-                maxKebahagiaan = lastKebahagiaan + kebahagiaan;
             }
-
             if (res.size() == 0) res.add(new ArrayList<>());
 
             res.add(new ArrayList<>(Arrays.asList(maxKebahagiaan)));
-
             dp.add(res);
 
         }
+    
     }
-
 
 }
  
