@@ -1,50 +1,72 @@
-import java.lang.Math;
 import java.util.Arrays;
+import java.util.ArrayList;
 
 public class Test {
+
     public static void main(String[] args) {
-        int[] harga = new int[] {2,8,12,19,30,39};
-        System.out.println(Arrays.toString(harga));
-        System.out.println(binarySearch(23, harga));
+        int[] hargaSuvenir = new int[] {100,5,5,6,7,8,9};
+        int[] kebahagiaanSuvenir = new int[] {1000,20,20,90,90,90,21};
+        int budget = 10;
+
+        O(1, budget, hargaSuvenir, kebahagiaanSuvenir);
+
+        System.out.println(dp);
     }
 
-    static int binarySearch(int hargaDicari, int[] harga) {
-        int l = 0;
-        int r = harga.length - 1;
+    static ArrayList<ArrayList<ArrayList<Integer>>> dp = new ArrayList<>(); 
+    // ArrayList of (ArrayList of (ArrayList (urutan indeks suvenir yang diurutkan secara leksikografis), int kebahagiaan max))
+    // 
 
-        if (harga[l] >= hargaDicari) return harga[l] - hargaDicari;
-        if (harga[r] <= hargaDicari) return hargaDicari - harga[r];
+    static void O(int lastInserted, int budget, int[] hargaSuvenir, int[]kebahagiaanSuvenir) {
 
-        while (l < r-1) {
+        for (int uang=lastInserted; uang<=budget; uang++) {
 
-            int mid = (l + r) / 2;
+            int maxKebahagiaan = 0;
 
-            System.out.print("l: ");
-            System.out.print(l);
-            System.out.print("   ");
-            System.out.print("mid: ");
-            System.out.print(mid);
-            System.out.print("    ");
-            System.out.print("r: ");
-            System.out.println(r);
+            ArrayList<ArrayList<Integer>> res = new ArrayList<>();
 
-            int diffMid = hargaDicari - harga[mid];
-            
-            System.out.print("diffMid: ");
-            System.out.println(diffMid);
+            for (int j=0; j<hargaSuvenir.length; j++) {
 
-            if (diffMid > 0) l = mid;
-            else if (diffMid < 0) r = mid;
-            else return 0;
+                int harga = hargaSuvenir[j];
+                int kebahagiaan = kebahagiaanSuvenir[j];
+
+                int sisa = uang - harga;
+                
+                if (sisa < 0) continue;
+
+                ArrayList<ArrayList<Integer>> rec = dp.get(sisa);
+
+                int lastKebahagiaan = rec.get(rec.size()-1).get(0);
+                if ((lastKebahagiaan + kebahagiaan) < maxKebahagiaan) continue;
+
+                for (int jj=0; jj<rec.size()-1; jj++) {
+                    ArrayList<Integer> lastArrayIndex = rec.get(jj);
+
+                    // Jika suvenir j sudah diambil
+                    if (lastArrayIndex.contains(j)) continue;
+
+                    // Jika ada 3 consecutive suvenir diambil berturut turut
+                    if (lastArrayIndex.contains(j+1) && lastArrayIndex.contains(j+2)) continue;  
+                    if (lastArrayIndex.contains(j-1) && lastArrayIndex.contains(j+1)) continue;
+                    if (lastArrayIndex.contains(j-2) && lastArrayIndex.contains(j-1)) continue;
+
+                    ArrayList<Integer> arrayIndex = new ArrayList<>(lastArrayIndex);
+                    arrayIndex.add(j);
+
+                    if ((lastKebahagiaan + kebahagiaan) > maxKebahagiaan) res.clear();
+                    res.add(arrayIndex);
+                    maxKebahagiaan = lastKebahagiaan + kebahagiaan;
+
+                }
+            }
+
+            if (res.size() == 0) res.add(new ArrayList<>());
+
+            res.add(new ArrayList<>(Arrays.asList(maxKebahagiaan)));
+
+            dp.add(res);
 
         }
-
-        System.out.print("l: ");
-        System.out.println(l);
-        System.out.print("r: ");
-        System.out.println(r);
-
-        return Math.min(Math.abs(hargaDicari - harga[l]), Math.abs(hargaDicari - harga[r]));
-
+    
     }
 }
