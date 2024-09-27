@@ -24,6 +24,7 @@ public class Solution {
     static Stack<Integer> kupon = new Stack<>();  // Kupon diskon 
 
     static int[][] dataPelanggan;  // Untuk menyimpan data pelanggan awal, index i = pelanggan id i
+    static int[] kesabaranAwal;
 
     static ArrayList<ArrayList<ArrayList<Integer>>> dp = new ArrayList<>(); 
     // ArrayList of (ArrayList of (ArrayList (urutan indeks suvenir, kebahagiaan max))
@@ -46,6 +47,7 @@ public class Solution {
         Arrays.sort(P);  // Sort harga ikan agar bisa dilakukan binary search utk method2 yang akan dipakai
         
         dataPelanggan = new int[Q][3];
+        kesabaranAwal = new int[Q];
 
         for (int i=0; i<N; i++) {
             P[i] = in.nextInt();
@@ -114,6 +116,7 @@ public class Solution {
         int[] newPelanggan = new int[]{id, budget, kesabaran + t};
         queue.offer(newPelanggan);
         dataPelanggan[id] = newPelanggan;
+        kesabaranAwal[id] = kesabaran;
         id++;
         return id-1;
     }
@@ -149,7 +152,8 @@ public class Solution {
             insertDP(lastInserted, x, H, V);
             lastInserted = x + 1;
         }
-        int kebahagiaanMaksimum = dp.get(x).getLast().get(0);
+        ArrayList<ArrayList<Integer>> jawaban = dp.get(x);
+        int kebahagiaanMaksimum = jawaban.get(jawaban.size()-1).get(0);
         System.out.println(kebahagiaanMaksimum);
     }
 
@@ -158,11 +162,11 @@ public class Solution {
             insertDP(lastInserted, x, H, V);
             lastInserted = x + 1;
         }
-
-        int kebahagiaanMaksimum = dp.get(x).getLast().get(0);
+        ArrayList<ArrayList<Integer>> jawaban = dp.get(x);
+        int kebahagiaanMaksimum = jawaban.get(jawaban.size()-1).get(0);
         System.out.print(kebahagiaanMaksimum);
         
-        ArrayList<Integer> indexMin = dp.get(x).getFirst();
+        ArrayList<Integer> indexMin = dp.get(x).get(0);
         for (int i=0; i<indexMin.size(); i++) {
             System.out.print(" ");
             System.out.print(indexMin.get(i) + 1);
@@ -255,7 +259,7 @@ public class Solution {
 
         int id = pelanggan[0];
         int budget = pelanggan[1];
-        int kesabaran = pelanggan[2];
+        int kesabaran = kesabaranAwal[id];
 
         int hargaIkan = hargaMax(budget, P);
 
@@ -328,8 +332,8 @@ public class Solution {
                     if (lastArrayIndex.contains(j-2) && lastArrayIndex.contains(j-1)) continue;
 
 
-                    if (lastArrayIndex.size() > 0 && lastArrayIndex.getFirst() > j) arrayIndex.addFirst(j);
-                    else if (lastArrayIndex.size() > 0 && lastArrayIndex.getLast() < j) arrayIndex.addLast(j);
+                    if (lastArrayIndex.size() > 0 && lastArrayIndex.get(0) > j) arrayIndex.add(0, j);
+                    else if (lastArrayIndex.size() > 0 && lastArrayIndex.get(lastArrayIndex.size()-1) < j) arrayIndex.add(j);
                     else if (lastArrayIndex.size() == 0) arrayIndex.add(j);
                     else continue;
 
