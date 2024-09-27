@@ -1,11 +1,22 @@
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.util.StringTokenizer;
 import java.util.Arrays;
 import java.util.PriorityQueue;
-import java.util.Scanner;
 import java.util.Stack;
 import java.lang.Math;
 import java.util.ArrayList;
 
+
+
 public class Solution {
+
+    private static InputReader in;
+    private static PrintWriter out;
 
     static PriorityQueue<int[]> queue = new PriorityQueue<>((a,b) -> {  // Queue pelanggan {id, budget, kesabaran}
         if (a[1]!=b[1]) return Integer.compare(b[1], a[1]);  // Compare budget (descending)
@@ -28,37 +39,38 @@ public class Solution {
 
     static ArrayList<ArrayList<ArrayList<Integer>>> dp = new ArrayList<>(); 
     // ArrayList of (ArrayList of (ArrayList (urutan indeks suvenir, kebahagiaan max))
-    // kebahagiaan max dimasukkan sebagai ArrayList dengan ukuran 1.
+    // kebahagiaan max dimasukkan sebagai ArrayList dengan ukuran 1 di indeks paling akhir.
 
     static int lastInserted = 0;
 
     public static void main(String[] args) {
 
-        Scanner in = new Scanner(System.in);
+        InputStream inputStream = System.in;
+        in = new InputReader(inputStream);
+        OutputStream outputStream = System.out;
+        out = new PrintWriter(outputStream);
 
-        int N = in.nextInt();  // Banyaknya ikan
-        int M = in.nextInt();  // Banyaknya suvenir
-        int Q = in.nextInt();  // Banyaknya aktivitas
+        int N = in.nextInteger();  // Banyaknya ikan
+        int M = in.nextInteger();  // Banyaknya suvenir
+        int Q = in.nextInteger();  // Banyaknya aktivitas
 
         P = new int[N];
         H = new int[M];
         V = new int[M];
-
-        Arrays.sort(P);  // Sort harga ikan agar bisa dilakukan binary search utk method2 yang akan dipakai
         
         dataPelanggan = new int[Q][3];
         kesabaranAwal = new int[Q];
 
         for (int i=0; i<N; i++) {
-            P[i] = in.nextInt();
+            P[i] = in.nextInteger();
         }
 
         for (int i=0; i<M; i++) {
-            H[i] = in.nextInt();
+            H[i] = in.nextInteger();
         }
 
         for (int i=0; i<M; i++) {
-            V[i] = in.nextInt();
+            V[i] = in.nextInteger();
         }
 
         for (int i=0; i<Q; i++) {
@@ -69,23 +81,23 @@ public class Solution {
 
             switch (query) {
                 case "A":  // Query A = masukkan pelanggan baru ke queue
-                    int budget = in.nextInt();
-                    int kesabaran = in.nextInt();
+                    int budget = in.nextInteger();
+                    int kesabaran = in.nextInteger();
                     System.out.println(A(budget, kesabaran));
                     break;
 
                 case "S":  // Query S = selisih minimum antara <hargaDicari> dengan semua harga ikan di toko
-                    int hargaDicari = in.nextInt();
+                    int hargaDicari = in.nextInteger();
                     System.out.println(S(hargaDicari));
                     break;
 
                 case "L":  // Query L = keluarkan pelanggan dengan id <idPelanggan> 
-                    int idPelanggan = in.nextInt();
+                    int idPelanggan = in.nextInteger();
                     System.out.println(L(idPelanggan));
                     break;
 
                 case "D":  // Tambahkan kupon diskon senilai <diskon> di atas tumpukan kupon diskon
-                    int diskon = in.nextInt();
+                    int diskon = in.nextInteger();
                     System.out.println(D(diskon));
                     break;
 
@@ -94,8 +106,8 @@ public class Solution {
                     break;
 
                 case "O":  // 
-                    int tipeQuery = in.nextInt();
-                    int x = in.nextInt();
+                    int tipeQuery = in.nextInteger();
+                    int x = in.nextInteger();
                     if (tipeQuery == 1) O1(x);
                     else if (tipeQuery == 2) O2(x);
                     break;
@@ -107,7 +119,7 @@ public class Solution {
             }
         }
 
-        in.close();
+        out.close();
         
     }
 
@@ -131,10 +143,8 @@ public class Solution {
         if (pelanggan[2] < (t+1) && queue.remove(pelanggan)) {
             return -1;
         }
-
         if (queue.remove(pelanggan)) {return pelanggan[1];}
         else return -1;
-
     } 
 
     static int D(int diskon) {
@@ -177,15 +187,12 @@ public class Solution {
 
 
     // Method pembantu
-    static void checkDepan() {
-
+    static void checkDepan() {  // Cek kesabaran orang paling depan, jika sudah marah pop sampai ketemu yang masih sabar
         if (queue.isEmpty()) return;
 
-        while (queue.peek() == null || queue.peek()[2] < (t+1)) {
+        while (queue.peek() == null || queue.peek()[2] < (t+1) && !queue.isEmpty()) {
             queue.poll();
-            if (queue.isEmpty()) return;
         }
-
     }
 
     static void printQueue() {  // Debug queue
@@ -218,15 +225,12 @@ public class Solution {
         if (budget > harga[r]) return harga[r];
 
         while (l < r-1) {
-
             int mid = (l + r) / 2;
 
             if (budget == harga[mid]) return harga[mid];
             else if (budget > harga[mid]) l = mid;
             else r = mid;
-
         }
-
         return harga[l];
     }
 
@@ -263,7 +267,7 @@ public class Solution {
 
         int hargaIkan = hargaMax(budget, P);
 
-        if (hargaIkan == -1) {
+        if (hargaIkan == -1) {  // Jika pelanggan tidak bisa membeli ikan apapun
             L(id);
             return id;
         }
@@ -277,10 +281,10 @@ public class Solution {
 
         int kembalian = budget - pay;
 
-        pelanggan[1] = kembalian;
+        pelanggan[1] = kembalian;  // Budget menjadi kembalian
         dataPelanggan[id][1] = kembalian;
 
-        pelanggan[2] = kesabaran + t;
+        pelanggan[2] = kesabaran + t;  // Update waktu pelanggan habis kesabaran
         dataPelanggan[id][2] = kesabaran + t;
 
         queue.offer(pelanggan);
@@ -353,6 +357,32 @@ public class Solution {
         }
     
     }
+
+    static class InputReader {
+        public BufferedReader reader;
+        public StringTokenizer tokenizer;
+
+        public InputReader(InputStream stream) {
+            reader = new BufferedReader(new InputStreamReader(stream), 32768);
+            tokenizer = null;
+        }
+
+        public String next() {
+            while (tokenizer == null || !tokenizer.hasMoreTokens()) {
+                try {
+                    tokenizer = new StringTokenizer(reader.readLine());
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+            return tokenizer.nextToken();
+        }
+
+        public int nextInteger() {
+            return Integer.parseInt(next());
+        }
+    }
+
 
 }
  
