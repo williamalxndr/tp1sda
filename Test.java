@@ -6,18 +6,18 @@ public class Test {
     static int iter = 0;
 
     public static void main(String[] args) {
-        int[] randomArr = new int[1000];
+        int[] randomArr = new int[]{1,2,3,4,5,6,7,8,9,10};
 
-        Random random = new Random();
+        // Random random = new Random();
 
-        int budget = random.nextInt(4000);
+        int budget = 10;
         System.out.print("Budget: ");
         System.out.println(budget);
 
-        randomArr[0] = random.nextInt(10);
-        for (int i=1; i<1000; i++) {
-            randomArr[i] = random.nextInt(randomArr[i-1], randomArr[i-1] + 10);
-        }
+        // randomArr[0] = random.nextInt(10);
+        // for (int i=1; i<1000; i++) {
+        //     randomArr[i] = random.nextInt(randomArr[i-1], randomArr[i-1] + 10);
+        // }
         System.out.println(Arrays.toString(randomArr));
 
         long startTime = System.nanoTime();
@@ -37,7 +37,7 @@ public class Test {
         int r = harga.length - 1;
 
         if (budget < harga[l]) return -1;
-        if (budget > harga[r]) return harga[r];
+        if (budget >= harga[r]) return harga[r];
 
         while (l < r-1) {
             iter++;

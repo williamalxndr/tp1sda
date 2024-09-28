@@ -188,11 +188,14 @@ public class Solution {
 
     // Method pembantu
     static void checkDepan() {  // Cek kesabaran orang paling depan, jika sudah marah pop sampai ketemu yang masih sabar
+
         if (queue.isEmpty()) return;
 
-        while (queue.peek() == null || queue.peek()[2] < (t+1) && !queue.isEmpty()) {
+        while (queue.peek() == null || queue.peek()[2] < (t+1)) {
             queue.poll();
+            if (queue.isEmpty()) return;
         }
+
     }
 
     static void printQueue() {  // Debug queue
@@ -222,7 +225,7 @@ public class Solution {
         int r = harga.length - 1;
 
         if (budget < harga[l]) return -1;
-        if (budget > harga[r]) return harga[r];
+        if (budget >= harga[r]) return harga[r];
 
         while (l < r-1) {
             int mid = (l + r) / 2;
@@ -281,10 +284,10 @@ public class Solution {
 
         int kembalian = budget - pay;
 
-        pelanggan[1] = kembalian;  // Budget menjadi kembalian
+        pelanggan[1] = kembalian;
         dataPelanggan[id][1] = kembalian;
 
-        pelanggan[2] = kesabaran + t;  // Update waktu pelanggan habis kesabaran
+        pelanggan[2] = kesabaran + t;
         dataPelanggan[id][2] = kesabaran + t;
 
         queue.offer(pelanggan);
