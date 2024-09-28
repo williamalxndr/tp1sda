@@ -5,8 +5,8 @@ import java.util.Scanner;
 public class Test {
 
     public static void main(String[] args) {
-        int[] hargaSuvenir = new int[] {100, 5, 5, 6, 6, 7, 7, 8, 8, 9};
-        int[] kebahagiaanSuvenir = new int[] {1000, 20, 20, 90, 80, 90, 80, 90, 80, 21};
+        int[] hargaSuvenir = new int[] {5,6,7,8,9,15};
+        int[] kebahagiaanSuvenir = new int[] {10,5,10,15,16,25};
 
         Scanner in = new Scanner(System.in);
 
@@ -14,7 +14,11 @@ public class Test {
 
         insertDP(0, budget, hargaSuvenir, kebahagiaanSuvenir);
 
-        System.out.println(dp.get(budget));
+        for (int i=0; i<dp.size(); i++) {
+            System.out.print("Uang: ");
+            System.out.println(i);
+            System.out.println(dp.get(i));
+        }
 
         in.close();
 
@@ -102,7 +106,10 @@ public class Test {
                     if ((lastKebahagiaan + kebahagiaan) > maxKebahagiaan) res.clear();
 
                     if (res.contains(arrayIndex)) continue;
-                    res.add(arrayIndex);
+
+                    if (!res.isEmpty()) {
+                        if (res.get(0).get(0) > arrayIndex.get(0)) res.add(0, arrayIndex);
+                    } else res.add(arrayIndex);
 
                     maxKebahagiaan = lastKebahagiaan + kebahagiaan;
                     System.out.printf("MAX = Last kebahagiaan: %d + kebahagiaan: %d = %d", lastKebahagiaan, kebahagiaan, maxKebahagiaan);

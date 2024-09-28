@@ -37,7 +37,7 @@ public class Solution {
     static int[][] dataPelanggan;  // Untuk menyimpan data pelanggan awal, index i = pelanggan id i
     static int[] kesabaranAwal;
 
-    static ArrayList<ArrayList<ArrayList<Integer>>> dp = new ArrayList<>(); 
+    static ArrayList<ArrayList<ArrayList<Long>>> dp = new ArrayList<>(); 
     // ArrayList of (ArrayList of (ArrayList (urutan indeks suvenir, kebahagiaan max))
     // kebahagiaan max dimasukkan sebagai ArrayList dengan ukuran 1 di indeks paling akhir.
 
@@ -180,8 +180,8 @@ public class Solution {
             insertDP(lastInserted, x, H, V);
             lastInserted = x + 1;
         }
-        ArrayList<ArrayList<Integer>> jawaban = dp.get(x);
-        int kebahagiaanMaksimum = jawaban.get(jawaban.size()-1).get(0);
+        ArrayList<ArrayList<Long>> jawaban = dp.get(x);
+        long kebahagiaanMaksimum = jawaban.get(jawaban.size()-1).get(0);
         System.out.println(kebahagiaanMaksimum);
     }
 
@@ -190,11 +190,11 @@ public class Solution {
             insertDP(lastInserted, x, H, V);
             lastInserted = x + 1;
         }
-        ArrayList<ArrayList<Integer>> jawaban = dp.get(x);
-        int kebahagiaanMaksimum = jawaban.get(jawaban.size()-1).get(0);
+        ArrayList<ArrayList<Long>> jawaban = dp.get(x);
+        long kebahagiaanMaksimum = jawaban.get(jawaban.size()-1).get(0);
         System.out.print(kebahagiaanMaksimum);
         
-        ArrayList<Integer> indexMin = dp.get(x).get(0);
+        ArrayList<Long> indexMin = dp.get(x).get(0);
         for (int i=0; i<indexMin.size(); i++) {
             System.out.print(" ");
             System.out.print(indexMin.get(i) + 1);
@@ -317,28 +317,28 @@ public class Solution {
 
         for (int uang=lastInserted; uang<=budget; uang++) {
 
-            int maxKebahagiaan = 0;
+            long maxKebahagiaan = 0;
 
-            ArrayList<ArrayList<Integer>> res = new ArrayList<>();
+            ArrayList<ArrayList<Long>> res = new ArrayList<>();
 
-            for (int j=0; j<hargaSuvenir.length; j++) {
+            for (long j=0; j<hargaSuvenir.length; j++) {
 
-                int harga = hargaSuvenir[j];
-                int kebahagiaan = kebahagiaanSuvenir[j];
+                int harga = hargaSuvenir[(int) j];
+                long kebahagiaan = kebahagiaanSuvenir[(int) j];
 
                 int sisa = uang - harga;
                 
                 if (sisa < 0) continue;
 
-                ArrayList<ArrayList<Integer>> rec = sisa != harga ? dp.get(sisa) : dp.get(sisa - 1); 
+                ArrayList<ArrayList<Long>> rec = sisa != harga ? dp.get(sisa) : dp.get(sisa - 1); 
 
-                int lastKebahagiaan = rec.get(rec.size()-1).get(0);
+                long lastKebahagiaan = rec.get(rec.size()-1).get(0);
                 if ((lastKebahagiaan + kebahagiaan) < maxKebahagiaan) continue;
 
                 for (int jj=0; jj<rec.size()-1; jj++) {
-                    ArrayList<Integer> lastArrayIndex = rec.get(jj);
+                    ArrayList<Long> lastArrayIndex = rec.get(jj);
 
-                    ArrayList<Integer> arrayIndex = new ArrayList<>(lastArrayIndex);
+                    ArrayList<Long> arrayIndex = new ArrayList<>(lastArrayIndex);
 
                     // Jika suvenir j sudah diambil
                     if (lastArrayIndex.contains(j)) {
@@ -360,9 +360,9 @@ public class Solution {
                     if (lastArrayIndex.contains(j-2) && lastArrayIndex.contains(j-1)) continue;
 
 
-                    if (lastArrayIndex.size() > 0 && lastArrayIndex.get(0) > j) arrayIndex.add(0, j);
-                    else if (lastArrayIndex.size() > 0 && lastArrayIndex.get(lastArrayIndex.size()-1) < j) arrayIndex.add(j);
-                    else if (lastArrayIndex.size() == 0) arrayIndex.add(j);
+                    if (lastArrayIndex.size() > 0 && lastArrayIndex.get(0) > j) arrayIndex.add(0,(long) j);
+                    else if (lastArrayIndex.size() > 0 && lastArrayIndex.get(lastArrayIndex.size()-1) < j) arrayIndex.add((long) j);
+                    else if (lastArrayIndex.size() == 0) arrayIndex.add((long) j);
                     else insertSort(j, arrayIndex);
 
                     if ((lastKebahagiaan + kebahagiaan) > maxKebahagiaan) res.clear();
@@ -379,8 +379,8 @@ public class Solution {
             res.add(new ArrayList<>(Arrays.asList(maxKebahagiaan)));
 
             if (uang > 0) {
-                ArrayList<ArrayList<Integer>> recSebelum = dp.get(uang-1);
-                int kebahagiaanSebelum = recSebelum.get(recSebelum.size()-1).get(0);
+                ArrayList<ArrayList<Long>> recSebelum = dp.get(uang-1);
+                long kebahagiaanSebelum = recSebelum.get(recSebelum.size()-1).get(0);
                 if (kebahagiaanSebelum > maxKebahagiaan) {
                     res.clear();
                     res.addAll(recSebelum);
@@ -390,7 +390,7 @@ public class Solution {
         }
     }
 
-    static void insertSort(int num, ArrayList<Integer> arr) {
+    static void insertSort(long num, ArrayList<Long> arr) {
         // Using binary search for inserting num to sortedArray in sorted order.
         int l = 0;
         int r = arr.size() - 1;
@@ -401,11 +401,11 @@ public class Solution {
             if (arr.get(mid) > num) r = mid;
             else if (arr.get(mid) < num) l = mid;
             else {
-                arr.add(mid, num);
+                arr.add(mid,(long) num);
                 return;
             }
         }
-        arr.add(r, num);
+        arr.add(r,(long) num);
     } 
 
 
