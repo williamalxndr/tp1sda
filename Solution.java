@@ -157,6 +157,24 @@ public class Solution {
         return kembalian;
     }
 
+    static void O(int tipeQuery, int x) {
+
+        // int[] pelanggan = queue.poll();
+
+        // if (pelanggan != null) {
+        //     int id = pelanggan[0];
+        //     int kesabaran = kesabaranAwal[id];
+    
+        //     pelanggan[2] = kesabaran + t;
+        //     dataPelanggan[id][2] = kesabaran + t;
+
+        //     queue.offer(pelanggan);
+        // }
+
+        if (tipeQuery == 1) O1(x);
+        else if (tipeQuery == 2) O2(x);
+    }
+
     static void O1(int x) {
         if (x >= lastInserted) {
             insertDP(lastInserted, x, H, V);
@@ -319,19 +337,22 @@ public class Solution {
 
                 for (int jj=0; jj<rec.size()-1; jj++) {
                     ArrayList<Integer> lastArrayIndex = rec.get(jj);
+
                     ArrayList<Integer> arrayIndex = new ArrayList<>(lastArrayIndex);
 
                     // Jika suvenir j sudah diambil
-                    if (lastArrayIndex.contains(j) && lastKebahagiaan >= maxKebahagiaan) {
-                        if (lastKebahagiaan > maxKebahagiaan) {
-                            res.clear();
-                            maxKebahagiaan = lastKebahagiaan;
-                        }
-                        if (!res.contains(arrayIndex)) {
-                            res.add(arrayIndex);
+                    if (lastArrayIndex.contains(j)) {
+                        if (lastKebahagiaan >= maxKebahagiaan) {
+                            if (lastKebahagiaan > maxKebahagiaan) {
+                                res.clear();
+                                maxKebahagiaan = lastKebahagiaan;
+                            }
+                            if (!res.contains(arrayIndex)) {
+                                res.add(arrayIndex);
+                            }
                         }
                         continue;
-                    } 
+                    }
 
                     // Jika ada 3 consecutive suvenir diambil berturut turut
                     if (lastArrayIndex.contains(j+1) && lastArrayIndex.contains(j+2)) continue;  
@@ -342,7 +363,7 @@ public class Solution {
                     if (lastArrayIndex.size() > 0 && lastArrayIndex.get(0) > j) arrayIndex.add(0, j);
                     else if (lastArrayIndex.size() > 0 && lastArrayIndex.get(lastArrayIndex.size()-1) < j) arrayIndex.add(j);
                     else if (lastArrayIndex.size() == 0) arrayIndex.add(j);
-                    else continue;
+                    else insertSort(j, arrayIndex);
 
                     if ((lastKebahagiaan + kebahagiaan) > maxKebahagiaan) res.clear();
 
@@ -352,14 +373,41 @@ public class Solution {
                     maxKebahagiaan = lastKebahagiaan + kebahagiaan;
                 }
             }
+    
             if (res.size() == 0) res.add(new ArrayList<>());
 
             res.add(new ArrayList<>(Arrays.asList(maxKebahagiaan)));
-            dp.add(res);
 
+            if (uang > 0) {
+                ArrayList<ArrayList<Integer>> recSebelum = dp.get(uang-1);
+                int kebahagiaanSebelum = recSebelum.get(recSebelum.size()-1).get(0);
+                if (kebahagiaanSebelum > maxKebahagiaan) {
+                    res.clear();
+                    res.addAll(recSebelum);
+                }
+            }
+            dp.add(res);
         }
-    
     }
+
+    static void insertSort(int num, ArrayList<Integer> arr) {
+        // Using binary search for inserting num to sortedArray in sorted order.
+        int l = 0;
+        int r = arr.size() - 1;
+
+        while (l < r-1) {
+            int mid = (l + r) / 2;
+
+            if (arr.get(mid) > num) r = mid;
+            else if (arr.get(mid) < num) l = mid;
+            else {
+                arr.add(mid, num);
+                return;
+            }
+        }
+        arr.add(r, num);
+    } 
+
 
     static class InputReader {
         public BufferedReader reader;
