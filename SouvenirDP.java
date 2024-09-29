@@ -192,8 +192,6 @@ public class SouvenirDP {
                             thirdIndices.add(j);
                             thirdIndices.addAll(thirdCandidate.get(1));
                         }
-
-
                     }
 
                 }
@@ -216,7 +214,8 @@ public class SouvenirDP {
                         resIndices.clear();
                         resIndices.add(secondIndices);
                     } else if (secondKebahagiaan == maxKebahagiaan) {
-                        resIndices.add(secondIndices);
+                        if (resIndices.isEmpty()) resIndices.add(secondIndices);
+                        else resIndices.add(moreLexicographical(resIndices.removeFirst(), secondIndices));
                     }
                 }
                 if (thirdCandidate != null) {
@@ -225,7 +224,8 @@ public class SouvenirDP {
                         resIndices.clear();
                         resIndices.add(thirdIndices);
                     } else if (thirdKebahagiaan == maxKebahagiaan) {
-                        resIndices.add(thirdIndices);
+                        if (resIndices.isEmpty()) resIndices.add(thirdIndices);
+                        else resIndices.add(moreLexicographical(resIndices.removeFirst(), thirdIndices));
                     }
                 }
                 if (fourthCandidate != null) {
@@ -233,6 +233,9 @@ public class SouvenirDP {
                         maxKebahagiaan = fourthKebahagiaan;
                         resIndices.clear();
                         resIndices.add(fourthIndices);
+                    } else if (fourthKebahagiaan == maxKebahagiaan) {
+                        if (resIndices.isEmpty()) resIndices.add(fourthIndices);
+                        else resIndices.add(moreLexicographical(resIndices.removeFirst(), fourthIndices));
                     }
                 }
 
@@ -258,40 +261,26 @@ public class SouvenirDP {
 
         }
     }
-
-    static int[] candidate(long uang, int harga, long j, long idx, long N) { 
-        if (idx > N-1) return null;
-        if (uang < harga) return null;
-
-        ArrayList<ArrayList<Long>> ans = dp.get((int) uang - harga).get((int) idx);
-
-        for (int i=1; i<ans.size(); i++) {
-            ArrayList<Long> indices = ans.get(i);
-            // System.out.print("Indices: ");
-            // System.out.println(indices);
-            // System.out.println(indices.contains(j));
-            if (indices.contains(j)) continue;
-            else if (indices.contains(j+1) && indices.contains(j+2)) continue;  
-            else return new int[]{(int) idx, i};
+    
+    static ArrayList<Long> moreLexicographical(ArrayList<Long> arr1, ArrayList<Long> arr2) {
+        int n = Math.min(arr1.size(), arr2.size());
+        
+        for (int i = 0; i < n; i++) {
+            if (arr1.get(i) < arr2.get(i)) {
+                return arr1;
+            } else if (arr1.get(i) > arr2.get(i)) {
+                return arr2;
+            }
         }
-        return candidate(uang, harga, j, idx+1, N);
+
+        if (arr1.size() < arr2.size()) {
+            return arr1;
+        } else {
+            return arr2;
+        }
     }
 
-    static int[] firstCandidate(long uang, long idx, long j, ArrayList<ArrayList<ArrayList<Long>>> row) {
 
-        if (idx >= row.size()) return null;
-
-        ArrayList<ArrayList<Long>> ans = row.get((int) idx);
-
-        for (int i=1; i<ans.size(); i++) {
-            ArrayList<Long> indices = ans.get(i);
-            System.out.print("Indices: ");
-            System.out.println(indices);
-            if (indices.contains(j+1) && indices.contains(j+2)) continue;  
-            else return new int[]{(int) idx, i};
-        }
-        return firstCandidate(uang, idx, j, row);
-    }
 
 
     static void printDP() {

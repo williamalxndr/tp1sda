@@ -37,9 +37,9 @@ public class Solution {
     static int[][] dataPelanggan;  // Untuk menyimpan data pelanggan awal, index i = pelanggan id i
     static int[] kesabaranAwal;
 
-    static ArrayList<ArrayList<ArrayList<Long>>> dp = new ArrayList<>(); 
-    // ArrayList of (ArrayList of (ArrayList (urutan indeks suvenir, kebahagiaan max))
-    // kebahagiaan max dimasukkan sebagai ArrayList dengan ukuran 1 di indeks paling akhir.
+    static ArrayList<ArrayList<ArrayList<ArrayList<Long>>>> dp = new ArrayList<>();
+    // ArrayList of (ArrayList of (ArrayList (kebahagiaan max, index suvenir))
+    // kebahagiaan max dimasukkan sebagai ArrayList dengan ukuran 1 di indeks paling awal.
 
     static int lastInserted = 0;
 
@@ -108,8 +108,7 @@ public class Solution {
                 case "O":  // 
                     int tipeQuery = in.nextInteger();
                     int x = in.nextInteger();
-                    if (tipeQuery == 1) O1(x);
-                    else if (tipeQuery == 2) O2(x);
+                    O(tipeQuery, x);
                     break;
                 
                 case "DEBUG":
@@ -159,42 +158,27 @@ public class Solution {
 
     static void O(int tipeQuery, int x) {
 
-        // int[] pelanggan = queue.poll();
-
-        // if (pelanggan != null) {
-        //     int id = pelanggan[0];
-        //     int kesabaran = kesabaranAwal[id];
-    
-        //     pelanggan[2] = kesabaran + t;
-        //     dataPelanggan[id][2] = kesabaran + t;
-
-        //     queue.offer(pelanggan);
-        // }
+        if (x >= lastInserted) {
+            insertDP(lastInserted, x, H, V);
+            lastInserted = x + 1;
+        }
 
         if (tipeQuery == 1) O1(x);
         else if (tipeQuery == 2) O2(x);
     }
 
     static void O1(int x) {
-        if (x >= lastInserted) {
-            insertDP(lastInserted, x, H, V);
-            lastInserted = x + 1;
-        }
-        ArrayList<ArrayList<Long>> jawaban = dp.get(x);
-        long kebahagiaanMaksimum = jawaban.get(jawaban.size()-1).get(0);
+        ArrayList<ArrayList<Long>> jawaban = dp.get(x).get(0);
+        long kebahagiaanMaksimum = jawaban.get(0).get(0);
         System.out.println(kebahagiaanMaksimum);
     }
 
     static void O2(int x) {
-        if (x >= lastInserted) {
-            insertDP(lastInserted, x, H, V);
-            lastInserted = x + 1;
-        }
-        ArrayList<ArrayList<Long>> jawaban = dp.get(x);
-        long kebahagiaanMaksimum = jawaban.get(jawaban.size()-1).get(0);
+        ArrayList<ArrayList<Long>> jawaban = dp.get(x).get(0);
+        long kebahagiaanMaksimum = jawaban.get(0).get(0);
         System.out.print(kebahagiaanMaksimum);
         
-        ArrayList<Long> indexMin = dp.get(x).get(0);
+        ArrayList<Long> indexMin = jawaban.get(1);
         for (int i=0; i<indexMin.size(); i++) {
             System.out.print(" ");
             System.out.print(indexMin.get(i) + 1);
@@ -313,83 +297,6 @@ public class Solution {
         return kembalian;
     }
 
-    static void insertDP(int lastInserted, int budget, int[] hargaSuvenir, int[]kebahagiaanSuvenir) {
-
-        for (int uang=lastInserted; uang<=budget; uang++) {
-
-            long maxKebahagiaan = 0;
-
-            ArrayList<ArrayList<Long>> res = new ArrayList<>();
-
-            for (long j=0; j<hargaSuvenir.length; j++) {
-
-                int harga = hargaSuvenir[(int) j];
-                long kebahagiaan = kebahagiaanSuvenir[(int) j];
-
-                int sisa = uang - harga;
-                
-                if (sisa < 0) continue;
-
-                ArrayList<ArrayList<Long>> rec = sisa != harga ? dp.get(sisa) : dp.get(sisa - 1); 
-
-                long lastKebahagiaan = rec.get(rec.size()-1).get(0);
-                if ((lastKebahagiaan + kebahagiaan) < maxKebahagiaan) continue;
-
-                for (int jj=0; jj<rec.size()-1; jj++) {
-                    ArrayList<Long> lastArrayIndex = rec.get(jj);
-
-                    ArrayList<Long> arrayIndex = new ArrayList<>(lastArrayIndex);
-
-                    // Jika suvenir j sudah diambil
-                    if (lastArrayIndex.contains(j)) {
-                        if (lastKebahagiaan >= maxKebahagiaan) {
-                            if (lastKebahagiaan > maxKebahagiaan) {
-                                res.clear();
-                                maxKebahagiaan = lastKebahagiaan;
-                            }
-                            if (!res.contains(arrayIndex)) {
-                                res.add(arrayIndex);
-                            }
-                        }
-                        continue;
-                    }
-
-                    // Jika ada 3 consecutive suvenir diambil berturut turut
-                    if (lastArrayIndex.contains(j+1) && lastArrayIndex.contains(j+2)) continue;  
-                    if (lastArrayIndex.contains(j-1) && lastArrayIndex.contains(j+1)) continue;
-                    if (lastArrayIndex.contains(j-2) && lastArrayIndex.contains(j-1)) continue;
-
-
-                    if (lastArrayIndex.size() > 0 && lastArrayIndex.get(0) > j) arrayIndex.add(0,(long) j);
-                    else if (lastArrayIndex.size() > 0 && lastArrayIndex.get(lastArrayIndex.size()-1) < j) arrayIndex.add((long) j);
-                    else if (lastArrayIndex.size() == 0) arrayIndex.add((long) j);
-                    else insertSort(j, arrayIndex);
-
-                    if ((lastKebahagiaan + kebahagiaan) > maxKebahagiaan) res.clear();
-
-                    if (res.contains(arrayIndex)) continue;
-                    res.add(arrayIndex);
-
-                    maxKebahagiaan = lastKebahagiaan + kebahagiaan;
-                }
-            }
-    
-            if (res.size() == 0) res.add(new ArrayList<>());
-
-            res.add(new ArrayList<>(Arrays.asList(maxKebahagiaan)));
-
-            if (uang > 0) {
-                ArrayList<ArrayList<Long>> recSebelum = dp.get(uang-1);
-                long kebahagiaanSebelum = recSebelum.get(recSebelum.size()-1).get(0);
-                if (kebahagiaanSebelum > maxKebahagiaan) {
-                    res.clear();
-                    res.addAll(recSebelum);
-                }
-            }
-            dp.add(res);
-        }
-    }
-
     static void insertSort(long num, ArrayList<Long> arr) {
         // Using binary search for inserting num to sortedArray in sorted order.
         int l = 0;
@@ -431,6 +338,210 @@ public class Solution {
 
         public int nextInteger() {
             return Integer.parseInt(next());
+        }
+    }
+
+    public static void insertDP(int lastInserted, int budget, int[] hargaSuvenir, int[] kebahagiaanSuvenir) {
+        
+        long N = hargaSuvenir.length;
+
+        if (lastInserted == 0) {
+            ArrayList<ArrayList<ArrayList<Long>>> row = new ArrayList<>();
+            for (int ii=0; ii<N; ii++) {
+                ArrayList<ArrayList<Long>> res = new ArrayList<>();
+                res.add(new ArrayList<>(Arrays.asList(0L)));
+                res.add(new ArrayList<>());
+                row.add(res);
+            } 
+            dp.add(row);     
+            lastInserted++;  
+        }
+
+
+        for (long uang=lastInserted; uang<=budget; uang++) {
+
+            ArrayList<ArrayList<ArrayList<Long>>> row = new ArrayList<ArrayList<ArrayList<Long>>>();
+
+            for (long j=N-1; j>=0; j--) {
+
+                int harga = hargaSuvenir[(int) j];
+                int kebahagiaan = kebahagiaanSuvenir[(int) j];
+
+                ArrayList<ArrayList<Long>> res = new ArrayList<>();
+                ArrayList<ArrayList<Long>> resIndices = new ArrayList<>();
+
+                ArrayList<ArrayList<Long>> firstCandidate = null;
+                ArrayList<ArrayList<Long>> secondCandidate = null;
+                ArrayList<ArrayList<Long>> thirdCandidate = null;
+                ArrayList<ArrayList<Long>> fourthCandidate = null;
+                
+                long firstKebahagiaan = 0;
+                long secondKebahagiaan = 0;
+                long thirdKebahagiaan = 0;
+                long fourthKebahagiaan = 0;
+
+                ArrayList<Long> firstIndices = new ArrayList<>();
+                ArrayList<Long> secondIndices = new ArrayList<>();
+                ArrayList<Long> thirdIndices = new ArrayList<>();
+                ArrayList<Long> fourthIndices = new ArrayList<>();
+
+
+                if (j<(N-1)) {  // Tidak membeli suvenir j
+                    firstCandidate = row.get(0);  // Samping
+                    firstKebahagiaan = firstCandidate.get(0).get(0);
+                    firstIndices = firstCandidate.get(1);   
+                }
+
+                secondCandidate = dp.get((int) uang - 1).get((int) j);  // Atas (budget sebelumnya), tidak membeli suvenir j
+                secondKebahagiaan = secondCandidate.get(0).get(0);
+                secondIndices = secondCandidate.get(1);                    
+
+                if (uang >= harga) {  // Membeli suvenir j
+                    
+                    if (j < N-2) {
+            
+                        thirdCandidate = dp.get((int) uang - harga).get((int) j+2);
+                        thirdKebahagiaan = thirdCandidate.get(0).get(0) + kebahagiaan;
+                        thirdIndices.add(j);
+                        thirdIndices.addAll(thirdCandidate.get(1));  
+                        
+                        int hargaSebelum = hargaSuvenir[(int) j+1];  // harga suvenir sebelum (j+1)
+                        int kebahagiaanSebelum = kebahagiaanSuvenir[(int) j+1];  // kebahagiaan suvenir sebelum (j+1)
+
+                        if (j < (N-3) && uang >= (harga+hargaSebelum)) {
+                            
+                            fourthCandidate = dp.get((int) uang - harga - hargaSebelum).get((int) j+3);  // harga + hargaSebelum(j+1) + dp longkap 1(j+3) (agar tidak consecutive 3)
+                            fourthKebahagiaan = fourthCandidate.get(0).get(0) + kebahagiaan + kebahagiaanSebelum;
+                            fourthIndices.add(j);
+                            fourthIndices.add(j+1);
+                            fourthIndices.addAll(fourthCandidate.get(1));                    
+                        } else if ((j == (N-3))) {
+
+                            if ((uang >= (harga + hargaSuvenir[(int) j+1])) && uang >= (harga + hargaSuvenir[(int) j+2])) {
+
+                                if (kebahagiaanSuvenir[(int) j+1] >= kebahagiaanSuvenir[(int) j+2]) {
+                                    fourthCandidate = row.get(0);
+                                    fourthKebahagiaan = kebahagiaanSuvenir[(int) j+1] + kebahagiaan;
+                                    fourthIndices.add(j);
+                                    fourthIndices.add(j+1);
+                                } else {
+                                    fourthCandidate = row.get(1);
+                                    fourthKebahagiaan = kebahagiaanSuvenir[(int) j+2] + kebahagiaan;
+                                    fourthIndices.add(j);
+                                    fourthIndices.add(j+2);
+                                }
+                            } else if (uang >= (harga + hargaSuvenir[(int) j+1])) {
+                                fourthCandidate = row.get(0);
+                                fourthKebahagiaan = kebahagiaanSuvenir[(int) j+1] + kebahagiaan;
+                                fourthIndices.add(j);
+                                fourthIndices.add(j+1);
+                            } else if (uang >= (harga + hargaSuvenir[(int) j+2])) {
+                                fourthCandidate = row.get(1);
+                                fourthKebahagiaan = kebahagiaanSuvenir[(int) j+2] + kebahagiaan;
+                                fourthIndices.add(j);
+                                fourthIndices.add(j+2);
+                            } else if (uang >= harga) {
+                                fourthCandidate = new ArrayList<>();
+                                fourthKebahagiaan = kebahagiaan;
+                                fourthIndices.add(j);
+                            }
+
+                        }
+                    } else if (j >= (N-2)) {
+
+                        if (j == (N-2)) {
+                            thirdCandidate = dp.get((int) uang-harga).get((int) j+1);
+                            thirdKebahagiaan = thirdCandidate.get(0).get(0) + kebahagiaan;
+                            thirdIndices.add(j);
+                            thirdIndices.addAll(thirdCandidate.get(1));
+                        } else if ((j == (N-1)) && harga == uang) {
+                            thirdCandidate = dp.get((int) uang-harga).get((int) j);
+                            thirdKebahagiaan = thirdCandidate.get(0).get(0) + kebahagiaan;
+                            thirdIndices.add(j);
+                            thirdIndices.addAll(thirdCandidate.get(1));
+                        }
+                    }
+
+                }
+
+                long maxKebahagiaan = 0;
+
+                if (firstCandidate != null) {
+                    if (firstKebahagiaan > maxKebahagiaan) {
+                        maxKebahagiaan = firstKebahagiaan;
+                        resIndices.add(firstIndices);
+                    }
+                }
+                if (secondCandidate != null) {
+                    if (secondKebahagiaan > maxKebahagiaan) {
+                        maxKebahagiaan = secondKebahagiaan;
+                        resIndices.clear();
+                        resIndices.add(secondIndices);
+                    } else if (secondKebahagiaan == maxKebahagiaan) {
+                        if (resIndices.isEmpty()) resIndices.add(secondIndices);
+                        else resIndices.add(moreLexicographical(resIndices.remove(0), secondIndices));
+                    }
+                }
+                if (thirdCandidate != null) {
+                    if (thirdKebahagiaan > maxKebahagiaan) {
+                        maxKebahagiaan = thirdKebahagiaan;
+                        resIndices.clear();
+                        resIndices.add(thirdIndices);
+                    } else if (thirdKebahagiaan == maxKebahagiaan) {
+                        if (resIndices.isEmpty()) resIndices.add(thirdIndices);
+                        else resIndices.add(moreLexicographical(resIndices.remove(0), thirdIndices));
+                    }
+                }
+                if (fourthCandidate != null) {
+                    if (fourthKebahagiaan > maxKebahagiaan) {
+                        maxKebahagiaan = fourthKebahagiaan;
+                        resIndices.clear();
+                        resIndices.add(fourthIndices);
+                    } else if (fourthKebahagiaan == maxKebahagiaan) {
+                        if (resIndices.isEmpty()) resIndices.add(fourthIndices);
+                        else resIndices.add(moreLexicographical(resIndices.remove(0), fourthIndices));
+                    }
+                }
+
+                res.add(new ArrayList<>(Arrays.asList(maxKebahagiaan)));
+                if (resIndices.isEmpty()) {
+                    res.add(new ArrayList<>());
+                } else {
+                    res.addAll(new ArrayList<>(resIndices));
+                }
+
+                row.add(0, res);
+            }
+            dp.add(row);
+
+        }
+    }
+    
+    static ArrayList<Long> moreLexicographical(ArrayList<Long> arr1, ArrayList<Long> arr2) {
+        int n = Math.min(arr1.size(), arr2.size());
+        
+        for (int i = 0; i < n; i++) {
+            if (arr1.get(i) < arr2.get(i)) {
+                return arr1;
+            } else if (arr1.get(i) > arr2.get(i)) {
+                return arr2;
+            }
+        }
+
+        if (arr1.size() < arr2.size()) {
+            return arr1;
+        } else {
+            return arr2;
+        }
+    }
+
+
+
+
+    static void printDP() {
+        for (int i=0; i<dp.size(); i++) {
+            System.out.printf("%d: ",i );
+            System.out.println(dp.get(i));
         }
     }
 
