@@ -156,7 +156,21 @@ public class SouvenirDP {
                                     fourthIndices.add(j);
                                     fourthIndices.add(j+2);
                                 }
-                            } 
+                            } else if (uang >= (harga + hargaSuvenir[(int) j+1])) {
+                                fourthCandidate = row.get(0);
+                                fourthKebahagiaan = kebahagiaanSuvenir[(int) j+1] + kebahagiaan;
+                                fourthIndices.add(j);
+                                fourthIndices.add(j+1);
+                            } else if (uang >= (harga + hargaSuvenir[(int) j+2])) {
+                                fourthCandidate = row.get(1);
+                                fourthKebahagiaan = kebahagiaanSuvenir[(int) j+2] + kebahagiaan;
+                                fourthIndices.add(j);
+                                fourthIndices.add(j+2);
+                            } else if (uang >= harga) {
+                                fourthCandidate = new ArrayList<>();
+                                fourthKebahagiaan = kebahagiaan;
+                                fourthIndices.add(j);
+                            }
 
 
 
